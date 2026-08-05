@@ -1,0 +1,75 @@
+let startTime;
+let logbook = JSON.parse(localStorage.getItem("logbook")) || [];
+const targetHours = 40; // learner goal
+
+document.getElementById("startBtn").onclick = () => {
+  startTime = new Date();
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  if (!startTime) return;
+  const endTime = new Date();
+  const duration = (endTime - startTime) / 1000 / 60; // minutes
+  logbook.push({
+    date: startTime.toLocaleString(),
+    duration,
+    night: document.getElementById("night").checked,
+    highway: document.getElementById("highway").checked
+  });
+  localStorage.setItem("logbook", JSON.stringify(logbook));
+  renderLogbook();
+  renderDashboard();
+  startTime = null;
+};
+
+function renderLogbook() {
+  const logDiv = document.getElementById("logbook");
+  logDiv.innerHTML = "<h2>Logbook</h2>" + logbook.map(
+    e => `<p>${e.date} — ${e.duration.toFixed(1)} min ${e.night ? "(Night)" : ""} ${e.highway ? "(Highway)" : ""}</p>`
+  ).join("");
+}
+
+function renderDashboard() {
+  const totalMinutes = logbook.reduce((sum, e) => sum + e.duration, 0);
+  const totalHours = totalMinutes / 60;
+  const remaining = targetHours - totalHours;
+
+  document.getElementById("dashboard").innerHTML =
+    `<h2>Dashboard</h2>
+     <p>Total Driving Time: ${totalHours.toFixed(1)} hours</p>
+     <p>Remaining to Goal (${targetHours} hrs): ${remaining.toFixed(1)} hours</p>`;
+
+  // Bar chart of sessions
+  const ctx1 = document.getElementById("hoursChart").getContext("2d");
+  new Chart(ctx1, {
+    type: "bar",
+    data: {
+      labels: logbook.map(e => e.date),
+      datasets: [{
+        label: "Session Duration (min)",
+        data: logbook.map(e => e.duration),
+        backgroundColor: "rgba(54, 162, 235, 0.6)"
+      }]
+    }
+  });
+
+  // Pie chart of categories
+  const nightHours = logbook.filter(e => e.night).reduce((sum, e) => sum + e.duration, 0) / 60;
+  const highwayHours = logbook.filter(e => e.highway).reduce((sum, e) => sum + e.duration, 0) / 60;
+  const otherHours = totalHours - nightHours - highwayHours;
+
+  const ctx2 = document.getElementById("categoryChart").getContext("2d");
+  new Chart(ctx2, {
+    type: "pie",
+    data: {
+      labels: ["Night", "Highway", "Other"],
+      datasets: [{
+        data: [nightHours, highwayHours, otherHours],
+        backgroundColor: ["#333", "#ff9800", "#4caf50"]
+      }]
+    }
+  });
+}
+
+renderLogbook();
+renderDashboard();

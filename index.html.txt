@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Driving Hours Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Driving Hours Tracker</h1>
+  <button id="startBtn">Start Driving</button>
+  <button id="stopBtn">Stop Driving</button>
+
+  <label>
+    <input type="checkbox" id="night"> Night Driving
+  </label>
+  <label>
+    <input type="checkbox" id="highway"> Highway Driving
+  </label>
+
+  <div id="logbook"></div>
+  <div id="dashboard"></div>
+
+  <canvas id="hoursChart" width="400" height="200"></canvas>
+  <canvas id="categoryChart" width="400" height="200"></canvas>
+
+  <!-- Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
